@@ -1,0 +1,17 @@
+{
+  "daemons": [
+    {
+      "label": "com.crowdstrike.falcond",
+      "status": "unloaded"
+    },
+    {
+      "label": "at.obdev.littlesnitchd",
+      "status": "unloaded"
+    },
+    {
+      "label": "com.opendns.osx.RoamingClientConfigUpdater",
+      "status": "running"
+    }
+  ],
+  "gatekeeper": "disabled"
+}

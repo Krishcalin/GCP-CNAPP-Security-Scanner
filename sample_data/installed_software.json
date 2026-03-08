@@ -1,0 +1,16 @@
+{
+  "software": [
+    {
+      "name": "CrowdStrike Falcon Sensor"
+    },
+    {
+      "name": "Microsoft Defender"
+    }
+  ],
+  "features": [
+    {
+      "name": "Windows-Defender",
+      "state": "disabled"
+    }
+  ]
+}

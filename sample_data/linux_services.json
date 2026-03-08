@@ -1,0 +1,20 @@
+{
+  "services": [
+    {
+      "name": "rsyslog",
+      "status": "inactive"
+    },
+    {
+      "name": "falcon-sensor",
+      "status": "stopped"
+    },
+    {
+      "name": "cbdaemon",
+      "status": "disabled"
+    },
+    {
+      "name": "mdatp",
+      "status": "stopped"
+    }
+  ]
+}

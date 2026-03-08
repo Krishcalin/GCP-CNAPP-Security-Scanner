@@ -1,0 +1,25 @@
+{
+  "services": [
+    {
+      "name": "WinDefend",
+      "status": "stopped",
+      "start_type": "disabled"
+    },
+    {
+      "name": "EventLog",
+      "status": "stopped"
+    },
+    {
+      "name": "Sense",
+      "status": "disabled"
+    },
+    {
+      "name": "MsMpSvc",
+      "status": "stopped"
+    },
+    {
+      "name": "Spooler",
+      "status": "running"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "processes": [
+    {
+      "name": "explorer.exe"
+    },
+    {
+      "name": "chrome.exe"
+    },
+    {
+      "name": "AdvancedRun.exe"
+    }
+  ]
+}

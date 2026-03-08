@@ -1,0 +1,12 @@
+{
+  "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\DisableAntiSpyware": "1",
+  "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection\\DisableRealtimeMonitoring": "1",
+  "HKCU\\Software\\Microsoft\\Office\\16.0\\Excel\\Security\\VBAWarnings": "1",
+  "HKCU\\Software\\Microsoft\\Office\\16.0\\Excel\\Security\\ProtectedView\\DisableInternetFilesInPV": "1",
+  "HKCU\\Software\\Policies\\Microsoft\\Windows\\OOBE\\DisablePrivacyExperience": "1",
+  "HKLM\\Software\\Policies\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\AutoAdminLogon": "1",
+  "HKLM\\SOFTWARE\\Microsoft\\AMSI\\Providers\\{2781761E-28E0-4109-99FE-B9D127C57AFE}": "MISSING",
+  "HKCU\\Software\\Microsoft\\Windows Script\\Settings\\AmsiEnable": "0",
+  "HKLM\\SYSTEM\\CurrentControlSet\\Control\\DeviceGuard\\Scenarios\\HypervisorEnforcedCodeIntegrity\\Enabled": "0",
+  "HKLM\\System\\CurrentControlSet\\Control\\WMI\\Autologger\\EventLog-Application\\Start": "0"
+}
