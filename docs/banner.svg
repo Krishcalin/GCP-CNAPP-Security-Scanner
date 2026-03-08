@@ -1,12 +1,146 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200">
-  <defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#04080f"/><stop offset="100%" style="stop-color:#0a1628"/></linearGradient><linearGradient id="tb" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#4285f4"/><stop offset="33%" style="stop-color:#34a853"/><stop offset="66%" style="stop-color:#fbbc04"/><stop offset="100%" style="stop-color:#ea4335"/></linearGradient></defs>
-  <rect width="900" height="200" rx="14" fill="url(#bg)"/><rect width="900" height="3" rx="1.5" fill="url(#tb)"/>
-  <text x="40" y="55" font-family="monospace" font-size="10" fill="#4285f4" letter-spacing="4" opacity="0.6">GOOGLE CLOUD PLATFORM</text>
-  <text x="40" y="95" font-family="sans-serif" font-size="34" font-weight="700" fill="#f1f5f9">GCP CNAPP Security Scanner</text>
-  <text x="40" y="130" font-family="monospace" font-size="18" fill="#4285f4" font-weight="700">CSPM · CIEM · CWPP · KSPM · IaC</text>
-  <text x="40" y="160" font-family="monospace" font-size="10" fill="#94a3b8">IAM · VPC · GCE · GCS · SQL · GKE · Functions · KMS · Terraform · CIS v2.0</text>
-  <g transform="translate(760,40)"><rect width="100" height="26" rx="13" fill="rgba(66,133,244,0.07)" stroke="#4285f4" stroke-width="0.8"/><text x="50" y="18" font-family="monospace" font-size="14" fill="#4285f4" text-anchor="middle" font-weight="700">v1.0</text></g>
-  <g transform="translate(720,80)"><rect width="140" height="26" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/><text x="12" y="18" font-family="monospace" font-size="16" fill="#4285f4" font-weight="700">15</text><text x="40" y="18" font-family="sans-serif" font-size="10" fill="#64748b">modules</text></g>
-  <g transform="translate(720,114)"><rect width="140" height="26" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/><text x="12" y="18" font-family="monospace" font-size="16" fill="#34a853" font-weight="700">67+</text><text x="52" y="18" font-family="sans-serif" font-size="10" fill="#64748b">checks</text></g>
-  <g transform="translate(720,148)"><rect width="140" height="26" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/><text x="12" y="18" font-family="monospace" font-size="14" fill="#ea4335" font-weight="700">0</text><text x="28" y="18" font-family="sans-serif" font-size="10" fill="#64748b">dependencies</text></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#040d1a"/>
+      <stop offset="40%" style="stop-color:#081726"/>
+      <stop offset="100%" style="stop-color:#0a1120"/>
+    </linearGradient>
+    <linearGradient id="topBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4285f4"/>
+      <stop offset="25%" style="stop-color:#34a853"/>
+      <stop offset="50%" style="stop-color:#fbbc04"/>
+      <stop offset="75%" style="stop-color:#ea4335"/>
+      <stop offset="100%" style="stop-color:#4285f4"/>
+    </linearGradient>
+    <linearGradient id="shieldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4285f4"/>
+      <stop offset="50%" style="stop-color:#34a853"/>
+      <stop offset="100%" style="stop-color:#4285f4"/>
+    </linearGradient>
+    <linearGradient id="shieldFill" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#4285f4;stop-opacity:0.08"/>
+      <stop offset="100%" style="stop-color:#34a853;stop-opacity:0.01"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#4285f4;stop-opacity:0.07"/>
+      <stop offset="100%" style="stop-color:#4285f4;stop-opacity:0"/>
+    </radialGradient>
+    <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="0.5" fill="#4285f4" opacity="0.04"/>
+    </pattern>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="2.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="clip"><rect width="900" height="260" rx="14"/></clipPath>
+  </defs>
+
+  <rect width="900" height="260" rx="14" fill="url(#bg)"/>
+  <rect width="900" height="260" rx="14" fill="url(#dots)"/>
+  <rect width="900" height="3" rx="1.5" fill="url(#topBar)" clip-path="url(#clip)"/>
+  <ellipse cx="100" cy="130" rx="120" ry="110" fill="url(#glow)"/>
+
+  <!-- Shield with Cloud + Lock -->
+  <g transform="translate(38, 35)" filter="url(#softGlow)">
+    <path d="M60 10 L108 30 L108 90 C108 126 86 148 60 158 C34 148 12 126 12 90 L12 30 Z"
+          fill="url(#shieldFill)" stroke="url(#shieldStroke)" stroke-width="2.2"/>
+    <!-- Cloud shape -->
+    <g transform="translate(28, 32)">
+      <ellipse cx="32" cy="28" rx="26" ry="16" fill="none" stroke="#4285f4" stroke-width="1.5" opacity="0.6"/>
+      <ellipse cx="20" cy="30" rx="14" ry="12" fill="none" stroke="#34a853" stroke-width="1" opacity="0.35"/>
+      <ellipse cx="46" cy="30" rx="14" ry="12" fill="none" stroke="#34a853" stroke-width="1" opacity="0.35"/>
+      <circle cx="22" cy="24" r="2" fill="#4285f4" opacity="0.5"/>
+      <circle cx="32" cy="20" r="2.5" fill="#34a853" opacity="0.5"/>
+      <circle cx="42" cy="24" r="2" fill="#fbbc04" opacity="0.5"/>
+    </g>
+    <!-- Lock -->
+    <rect x="47" y="80" width="26" height="20" rx="4" fill="#4285f4" opacity="0.35"/>
+    <path d="M52 80 V73 C52 66 68 66 68 73 V80" fill="none" stroke="#4285f4" stroke-width="2" opacity="0.5"/>
+    <circle cx="60" cy="90" r="3" fill="#040d1a"/>
+    <line x1="60" y1="90" x2="60" y2="95" stroke="#040d1a" stroke-width="1.5"/>
+    <!-- Checkmark -->
+    <path d="M46 118 L54 126 L74 106" fill="none" stroke="#34a853" stroke-width="2.8"
+          stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+    <line x1="25" y1="45" x2="95" y2="45" stroke="#4285f4" stroke-width="0.4" opacity="0.15"/>
+    <line x1="20" y1="105" x2="100" y2="105" stroke="#34a853" stroke-width="0.4" opacity="0.15"/>
+  </g>
+
+  <!-- Label -->
+  <text x="220" y="55" font-family="'Courier New', monospace" font-size="10.5"
+        fill="#4285f4" letter-spacing="5" opacity="0.6">GOOGLE CLOUD PLATFORM</text>
+  <!-- Title -->
+  <text x="220" y="98" font-family="'Segoe UI', 'Helvetica Neue', sans-serif"
+        font-size="36" font-weight="700" fill="#f1f5f9" letter-spacing="-0.5">CNAPP Security</text>
+  <text x="551" y="98" font-family="'Courier New', monospace"
+        font-size="28" font-weight="700" fill="#34a853" letter-spacing="1"> Scanner</text>
+  <!-- CNAPP pillars in Google colors -->
+  <text x="220" y="130" font-family="'Courier New', monospace" font-size="17" fill="#4285f4" font-weight="700">CSPM</text>
+  <text x="279" y="130" font-family="monospace" font-size="17" fill="#334155"> · </text>
+  <text x="295" y="130" font-family="'Courier New', monospace" font-size="17" fill="#34a853" font-weight="700">CIEM</text>
+  <text x="349" y="130" font-family="monospace" font-size="17" fill="#334155"> · </text>
+  <text x="365" y="130" font-family="'Courier New', monospace" font-size="17" fill="#fbbc04" font-weight="700">CWPP</text>
+  <text x="424" y="130" font-family="monospace" font-size="17" fill="#334155"> · </text>
+  <text x="440" y="130" font-family="'Courier New', monospace" font-size="17" fill="#ea4335" font-weight="700">KSPM</text>
+  <text x="499" y="130" font-family="monospace" font-size="17" fill="#334155"> · </text>
+  <text x="515" y="130" font-family="'Courier New', monospace" font-size="17" fill="#4285f4" font-weight="700">IaC</text>
+
+  <line x1="220" y1="145" x2="560" y2="145" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Service list -->
+  <g transform="translate(220, 160)">
+    <text x="0" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">IAM</text>
+    <circle cx="24" cy="7" r="1.3" fill="#334155"/>
+    <text x="32" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">VPC</text>
+    <circle cx="57" cy="7" r="1.3" fill="#334155"/>
+    <text x="65" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">GCE</text>
+    <circle cx="90" cy="7" r="1.3" fill="#334155"/>
+    <text x="98" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">GCS</text>
+    <circle cx="123" cy="7" r="1.3" fill="#334155"/>
+    <text x="131" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">Cloud SQL</text>
+    <circle cx="185" cy="7" r="1.3" fill="#334155"/>
+    <text x="193" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">GKE</text>
+    <circle cx="217" cy="7" r="1.3" fill="#334155"/>
+    <text x="225" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">Functions</text>
+    <circle cx="285" cy="7" r="1.3" fill="#334155"/>
+    <text x="293" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">BigQuery</text>
+    <circle cx="350" cy="7" r="1.3" fill="#334155"/>
+    <text x="358" y="10" font-family="'Segoe UI', sans-serif" font-size="11.5" fill="#94a3b8">KMS</text>
+  </g>
+
+  <!-- Compliance badges -->
+  <g transform="translate(220, 185)">
+    <rect x="0" y="0" width="115" height="24" rx="5" fill="rgba(52,168,83,0.06)" stroke="#34a853" stroke-width="0.7" opacity="0.85"/>
+    <text x="57" y="16" font-family="monospace" font-size="9" fill="#34a853" text-anchor="middle">CIS GCP v2.0</text>
+    <rect x="123" y="0" width="100" height="24" rx="5" fill="rgba(66,133,244,0.06)" stroke="#4285f4" stroke-width="0.7" opacity="0.85"/>
+    <text x="173" y="16" font-family="monospace" font-size="9" fill="#4285f4" text-anchor="middle">NIST 800-53</text>
+    <rect x="231" y="0" width="72" height="24" rx="5" fill="rgba(251,188,4,0.06)" stroke="#fbbc04" stroke-width="0.7" opacity="0.85"/>
+    <text x="267" y="16" font-family="monospace" font-size="9" fill="#fbbc04" text-anchor="middle">SOC 2</text>
+    <rect x="311" y="0" width="90" height="24" rx="5" fill="rgba(234,67,53,0.06)" stroke="#ea4335" stroke-width="0.7" opacity="0.85"/>
+    <text x="356" y="16" font-family="monospace" font-size="9" fill="#ea4335" text-anchor="middle">ISO 27001</text>
+  </g>
+
+  <!-- Version pill -->
+  <g transform="translate(770, 48)">
+    <rect x="0" y="0" width="84" height="32" rx="16" fill="rgba(66,133,244,0.07)" stroke="#4285f4" stroke-width="0.9"/>
+    <text x="42" y="21" font-family="monospace" font-size="15" fill="#4285f4" text-anchor="middle" font-weight="700">v1.0</text>
+  </g>
+  <!-- Stat cards -->
+  <g transform="translate(740, 100)">
+    <rect x="0" y="0" width="125" height="32" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/>
+    <text x="14" y="22" font-family="monospace" font-size="20" fill="#4285f4" font-weight="700">15</text>
+    <text x="46" y="22" font-family="'Segoe UI', sans-serif" font-size="11" fill="#64748b">modules</text>
+  </g>
+  <g transform="translate(740, 140)">
+    <rect x="0" y="0" width="125" height="32" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/>
+    <text x="14" y="22" font-family="monospace" font-size="20" fill="#34a853" font-weight="700">67+</text>
+    <text x="62" y="22" font-family="'Segoe UI', sans-serif" font-size="11" fill="#64748b">checks</text>
+  </g>
+  <g transform="translate(740, 180)">
+    <rect x="0" y="0" width="125" height="32" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/>
+    <text x="14" y="22" font-family="monospace" font-size="16" fill="#ea4335" font-weight="700">0</text>
+    <text x="30" y="22" font-family="'Segoe UI', sans-serif" font-size="11" fill="#64748b">dependencies</text>
+  </g>
+
+  <!-- Bottom accent -->
+  <rect y="256" width="900" height="4" rx="2" fill="url(#topBar)" clip-path="url(#clip)" opacity="0.3"/>
 </svg>
