@@ -1,0 +1,79 @@
+{
+  "rules": [
+    {
+      "name": "allow-ssh-all",
+      "direction": "INGRESS",
+      "sourceRanges": [
+        "0.0.0.0/0"
+      ],
+      "allowed": [
+        {
+          "IPProtocol": "tcp",
+          "ports": [
+            "22"
+          ]
+        }
+      ],
+      "disabled": false
+    },
+    {
+      "name": "allow-rdp-all",
+      "direction": "INGRESS",
+      "sourceRanges": [
+        "0.0.0.0/0"
+      ],
+      "allowed": [
+        {
+          "IPProtocol": "tcp",
+          "ports": [
+            "3389"
+          ]
+        }
+      ],
+      "disabled": false
+    },
+    {
+      "name": "allow-all-internal",
+      "direction": "INGRESS",
+      "sourceRanges": [
+        "10.0.0.0/8"
+      ],
+      "allowed": [
+        {
+          "IPProtocol": "all"
+        }
+      ],
+      "disabled": false
+    },
+    {
+      "name": "allow-everything",
+      "direction": "INGRESS",
+      "sourceRanges": [
+        "0.0.0.0/0"
+      ],
+      "allowed": [
+        {
+          "IPProtocol": "all"
+        }
+      ],
+      "disabled": false
+    },
+    {
+      "name": "allow-http",
+      "direction": "INGRESS",
+      "sourceRanges": [
+        "0.0.0.0/0"
+      ],
+      "allowed": [
+        {
+          "IPProtocol": "tcp",
+          "ports": [
+            "80",
+            "443"
+          ]
+        }
+      ],
+      "disabled": false
+    }
+  ]
+}

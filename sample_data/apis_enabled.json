@@ -1,0 +1,20 @@
+[
+  {
+    "name": "compute.googleapis.com"
+  },
+  {
+    "name": "storage.googleapis.com"
+  },
+  {
+    "name": "sqladmin.googleapis.com"
+  },
+  {
+    "name": "container.googleapis.com"
+  },
+  {
+    "name": "cloudfunctions.googleapis.com"
+  },
+  {
+    "name": "cloudkms.googleapis.com"
+  }
+]

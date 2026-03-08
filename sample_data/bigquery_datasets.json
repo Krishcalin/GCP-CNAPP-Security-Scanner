@@ -1,0 +1,30 @@
+{
+  "datasets": [
+    {
+      "datasetReference": {
+        "datasetId": "analytics"
+      },
+      "access": [
+        {
+          "specialGroup": "allAuthenticatedUsers",
+          "role": "READER"
+        }
+      ],
+      "defaultEncryptionConfiguration": {}
+    },
+    {
+      "datasetReference": {
+        "datasetId": "internal_data"
+      },
+      "access": [
+        {
+          "userByEmail": "analyst@corp.com",
+          "role": "WRITER"
+        }
+      ],
+      "defaultEncryptionConfiguration": {
+        "kmsKeyName": "key1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "disks": [
+    {
+      "name": "web-disk",
+      "diskEncryptionKey": {}
+    },
+    {
+      "name": "app-disk",
+      "diskEncryptionKey": {
+        "kmsKeyName": "projects/proj/locations/us/keyRings/kr/cryptoKeys/key1"
+      }
+    },
+    {
+      "name": "db-disk",
+      "diskEncryptionKey": {}
+    }
+  ]
+}

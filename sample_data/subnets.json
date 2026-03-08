@@ -1,0 +1,25 @@
+{
+  "subnets": [
+    {
+      "name": "default-subnet",
+      "privateIpGoogleAccess": false,
+      "logConfig": {
+        "enable": false
+      }
+    },
+    {
+      "name": "prod-subnet-1",
+      "privateIpGoogleAccess": true,
+      "logConfig": {
+        "enable": true
+      }
+    },
+    {
+      "name": "prod-subnet-2",
+      "privateIpGoogleAccess": false,
+      "logConfig": {
+        "enable": false
+      }
+    }
+  ]
+}

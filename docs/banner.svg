@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200">
+  <defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#04080f"/><stop offset="100%" style="stop-color:#0a1628"/></linearGradient><linearGradient id="tb" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#4285f4"/><stop offset="33%" style="stop-color:#34a853"/><stop offset="66%" style="stop-color:#fbbc04"/><stop offset="100%" style="stop-color:#ea4335"/></linearGradient></defs>
+  <rect width="900" height="200" rx="14" fill="url(#bg)"/><rect width="900" height="3" rx="1.5" fill="url(#tb)"/>
+  <text x="40" y="55" font-family="monospace" font-size="10" fill="#4285f4" letter-spacing="4" opacity="0.6">GOOGLE CLOUD PLATFORM</text>
+  <text x="40" y="95" font-family="sans-serif" font-size="34" font-weight="700" fill="#f1f5f9">GCP CNAPP Security Scanner</text>
+  <text x="40" y="130" font-family="monospace" font-size="18" fill="#4285f4" font-weight="700">CSPM · CIEM · CWPP · KSPM · IaC</text>
+  <text x="40" y="160" font-family="monospace" font-size="10" fill="#94a3b8">IAM · VPC · GCE · GCS · SQL · GKE · Functions · KMS · Terraform · CIS v2.0</text>
+  <g transform="translate(760,40)"><rect width="100" height="26" rx="13" fill="rgba(66,133,244,0.07)" stroke="#4285f4" stroke-width="0.8"/><text x="50" y="18" font-family="monospace" font-size="14" fill="#4285f4" text-anchor="middle" font-weight="700">v1.0</text></g>
+  <g transform="translate(720,80)"><rect width="140" height="26" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/><text x="12" y="18" font-family="monospace" font-size="16" fill="#4285f4" font-weight="700">15</text><text x="40" y="18" font-family="sans-serif" font-size="10" fill="#64748b">modules</text></g>
+  <g transform="translate(720,114)"><rect width="140" height="26" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/><text x="12" y="18" font-family="monospace" font-size="16" fill="#34a853" font-weight="700">67+</text><text x="52" y="18" font-family="sans-serif" font-size="10" fill="#64748b">checks</text></g>
+  <g transform="translate(720,148)"><rect width="140" height="26" rx="6" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="0.6"/><text x="12" y="18" font-family="monospace" font-size="14" fill="#ea4335" font-weight="700">0</text><text x="28" y="18" font-family="sans-serif" font-size="10" fill="#64748b">dependencies</text></g>
+</svg>

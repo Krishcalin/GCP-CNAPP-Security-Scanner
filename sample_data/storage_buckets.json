@@ -1,0 +1,46 @@
+{
+  "buckets": [
+    {
+      "name": "public-assets",
+      "iamConfiguration": {
+        "uniformBucketLevelAccess": {
+          "enabled": false
+        }
+      },
+      "acl": [
+        {
+          "entity": "allUsers",
+          "role": "READER"
+        }
+      ],
+      "logging": {},
+      "encryption": {}
+    },
+    {
+      "name": "logs-bucket",
+      "iamConfiguration": {
+        "uniformBucketLevelAccess": {
+          "enabled": true
+        }
+      },
+      "acl": [],
+      "logging": {
+        "logBucket": "audit-logs"
+      },
+      "encryption": {
+        "defaultKmsKeyName": "projects/proj/locations/us/keyRings/kr/cryptoKeys/key1"
+      }
+    },
+    {
+      "name": "data-bucket",
+      "iamConfiguration": {
+        "uniformBucketLevelAccess": {
+          "enabled": false
+        }
+      },
+      "acl": [],
+      "logging": {},
+      "encryption": {}
+    }
+  ]
+}

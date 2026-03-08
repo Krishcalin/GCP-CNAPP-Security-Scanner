@@ -1,0 +1,2345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Cloud Platform — Security Assessment Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-secondary: #111827;
+    --bg-card: #1a2332;
+    --bg-card-hover: #1f2b3d;
+    --border: #2a3548;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #4285f4;
+    --accent-dim: rgba(56, 189, 248, 0.1);
+    --critical: #ef4444;
+    --critical-bg: rgba(239, 68, 68, 0.08);
+    --high: #f97316;
+    --high-bg: rgba(249, 115, 22, 0.08);
+    --medium: #eab308;
+    --medium-bg: rgba(234, 179, 8, 0.08);
+    --low: #22c55e;
+    --low-bg: rgba(34, 197, 94, 0.08);
+    --info-c: #4285f4;
+    --info-bg: rgba(56, 189, 248, 0.08);
+    --font-sans: 'DM Sans', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .noise {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-left h1 {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  .header-left .subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .header-right {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .header-right span {
+    display: block;
+  }
+
+  /* Summary Grid */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* Risk Score */
+  .risk-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .risk-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: #dc2626;
+  }
+
+  .risk-score-ring {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .risk-score-ring svg {
+    transform: rotate(-90deg);
+    width: 140px;
+    height: 140px;
+  }
+
+  .risk-score-ring .score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .risk-score-ring .score-number {
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #dc2626;
+    line-height: 1;
+  }
+
+  .risk-score-ring .score-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .risk-level {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Severity Cards */
+  .severity-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .sev-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .sev-card:hover {
+    background: var(--bg-card-hover);
+  }
+
+  .sev-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .sev-card.critical::before { background: var(--critical); }
+  .sev-card.high::before { background: var(--high); }
+  .sev-card.medium::before { background: var(--medium); }
+  .sev-card.low::before { background: var(--low); }
+
+  .sev-card .sev-count {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .sev-card.critical .sev-count { color: var(--critical); }
+  .sev-card.high .sev-count { color: var(--high); }
+  .sev-card.medium .sev-count { color: var(--medium); }
+  .sev-card.low .sev-count { color: var(--low); }
+
+  .sev-card .sev-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+  }
+
+  /* Category breakdown bar */
+  .categories-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .categories-section h2 {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  .cat-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cat-bar-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 50px;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cat-bar-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    text-align: right;
+  }
+
+  .cat-bar-track {
+    height: 20px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .cat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #818cf8);
+    border-radius: 4px;
+    min-width: 2px;
+    transition: width 0.8s ease-out;
+  }
+
+  .cat-bar-count {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-bar label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.5rem;
+  }
+
+  .filter-btn {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Findings */
+  .findings-section h2 {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  .finding-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .finding-card:hover {
+    background: var(--bg-card-hover);
+  }
+
+  .finding-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sev-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    min-width: 72px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .sev-badge.CRITICAL { background: var(--critical-bg); color: var(--critical); border: 1px solid rgba(239,68,68,0.2); }
+  .sev-badge.HIGH { background: var(--high-bg); color: var(--high); border: 1px solid rgba(249,115,22,0.2); }
+  .sev-badge.MEDIUM { background: var(--medium-bg); color: var(--medium); border: 1px solid rgba(234,179,8,0.2); }
+  .sev-badge.LOW { background: var(--low-bg); color: var(--low); border: 1px solid rgba(34,197,94,0.2); }
+  .sev-badge.INFO { background: var(--info-bg); color: var(--info-c); border: 1px solid rgba(56,189,248,0.2); }
+
+  .finding-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+  }
+
+  .finding-id {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .finding-chevron {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+  }
+
+  .finding-card.open .finding-chevron {
+    transform: rotate(90deg);
+  }
+
+  .finding-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .finding-card.open .finding-body {
+    display: block;
+  }
+
+  .finding-section {
+    margin-top: 1rem;
+  }
+
+  .finding-section-title {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  .finding-section p {
+    font-size: 0.825rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .affected-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: var(--bg-primary);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .affected-list li {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: 0.2rem 0;
+    border-bottom: 1px solid rgba(42, 53, 72, 0.5);
+  }
+
+  .affected-list li:last-child { border: none; }
+
+  .ref-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .ref-list li {
+    font-size: 0.8rem;
+    color: var(--accent);
+    padding: 0.15rem 0;
+  }
+
+  .ref-list li::before {
+    content: '→ ';
+    color: var(--text-muted);
+  }
+
+  .remediation-text {
+    background: rgba(34, 197, 94, 0.05);
+    border-left: 3px solid var(--low);
+    padding: 0.75rem 1rem;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.825rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .summary-grid { grid-template-columns: 1fr; }
+    .severity-grid { grid-template-columns: repeat(2, 1fr); }
+    .cat-bar-row { grid-template-columns: 140px 1fr 40px; }
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; color: #111; }
+    .finding-body { display: block !important; }
+    .noise { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <div class="header">
+    <div class="header-left">
+      <h1>&#x1f6e1; Google Cloud Platform</h1>
+      <div class="subtitle">Security Assessment Report</div>
+    </div>
+    <div class="header-right">
+      <span>Scan: 2026-03-08T06:01:54</span>
+      <span>Source: sample_data</span>
+      <span>Modules: iam, network, compute, storage, database, logging, bigquery, ciem, sa, gke, serverless, container, iac, cis, kms</span>
+    </div>
+  </div>
+
+  <!-- Summary Grid -->
+  <div class="summary-grid">
+    <div class="risk-card">
+      <div class="risk-score-ring">
+        <svg viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="#1e293b" stroke-width="10"/>
+          <circle cx="70" cy="70" r="60" fill="none" stroke="#dc2626" stroke-width="10"
+            stroke-dasharray="377.0 0.0"
+            stroke-linecap="round"/>
+        </svg>
+        <div class="score-text">
+          <div class="score-number">100</div>
+          <div class="score-label">Risk Score</div>
+        </div>
+      </div>
+      <div class="risk-level">Critical Risk</div>
+    </div>
+
+    <div class="severity-grid">
+      <div class="sev-card critical">
+        <div class="sev-count">8</div>
+        <div class="sev-label">Critical</div>
+      </div>
+      <div class="sev-card high">
+        <div class="sev-count">28</div>
+        <div class="sev-label">High</div>
+      </div>
+      <div class="sev-card medium">
+        <div class="sev-count">16</div>
+        <div class="sev-label">Medium</div>
+      </div>
+      <div class="sev-card low">
+        <div class="sev-count">4</div>
+        <div class="sev-label">Low</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Breakdown -->
+  <div class="categories-section">
+    <h2>Findings by Category</h2>
+    <div class="cat-bars">
+      
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">IAM &amp; Org Policy</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 100.0%"></div></div>
+        <div class="cat-bar-count">8</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">GKE Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 100.0%"></div></div>
+        <div class="cat-bar-count">8</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Network &amp; VPC</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 75.0%"></div></div>
+        <div class="cat-bar-count">6</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Compute Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 75.0%"></div></div>
+        <div class="cat-bar-count">6</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Cloud Storage</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 62.5%"></div></div>
+        <div class="cat-bar-count">5</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Cloud SQL</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 62.5%"></div></div>
+        <div class="cat-bar-count">5</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Logging &amp; Monitoring</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 50.0%"></div></div>
+        <div class="cat-bar-count">4</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Service Account Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 50.0%"></div></div>
+        <div class="cat-bar-count">4</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Serverless Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 37.5%"></div></div>
+        <div class="cat-bar-count">3</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">BigQuery</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 25.0%"></div></div>
+        <div class="cat-bar-count">2</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">CIEM Entitlements</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 12.5%"></div></div>
+        <div class="cat-bar-count">1</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Container Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 12.5%"></div></div>
+        <div class="cat-bar-count">1</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">IaC Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 12.5%"></div></div>
+        <div class="cat-bar-count">1</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">CIS Benchmark</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 12.5%"></div></div>
+        <div class="cat-bar-count">1</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">KMS &amp; Encryption</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 12.5%"></div></div>
+        <div class="cat-bar-count">1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <label>Filter:</label>
+    <button class="filter-btn active" onclick="filterFindings('ALL')">All (56)</button>
+    <button class="filter-btn" onclick="filterFindings('CRITICAL')">Critical (8)</button>
+    <button class="filter-btn" onclick="filterFindings('HIGH')">High (28)</button>
+    <button class="filter-btn" onclick="filterFindings('MEDIUM')">Medium (16)</button>
+    <button class="filter-btn" onclick="filterFindings('LOW')">Low (4)</button>
+  </div>
+
+  <!-- Findings -->
+  <div class="findings-section">
+    <h2>Detailed Findings (56)</h2>
+    
+    <div class="finding-card" data-severity="CRITICAL" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">Service accounts with admin/owner roles</span>
+        <span class="finding-id">IAM-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Service accounts should not have Owner or Admin roles.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>serviceAccount:ci-cd@proj.iam.gserviceaccount.com → roles/owner</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove admin/owner roles from service accounts. Use custom roles.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.5</li><li>CIS GCP 1.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Network &amp; VPC">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">SSH open to internet (2 rules)</span>
+        <span class="finding-id">NET-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>SSH (port 22) accessible from 0.0.0.0/0.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>allow-ssh-all: 0.0.0.0/0 → TCP/22</li><li>allow-everything: 0.0.0.0/0 → TCP/22</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict SSH to specific IP ranges. Use IAP for SSH access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 3.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Network &amp; VPC">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">RDP open to internet (1 rules)</span>
+        <span class="finding-id">NET-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>RDP (3389) accessible from 0.0.0.0/0.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>allow-rdp-all: 0.0.0.0/0 → TCP/3389</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Block RDP from internet. Use IAP tunneling.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 3.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Network &amp; VPC">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">Firewall rules allowing all traffic from internet (1)</span>
+        <span class="finding-id">NET-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Rules allow all protocols/ports from 0.0.0.0/0.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>allow-everything: 0.0.0.0/0 → ALL protocols/ports</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove overly permissive rules. Implement least-privilege access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 3.8</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Compute Security">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">VMs using default SA with full scope</span>
+        <span class="finding-id">COMP-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Default compute SA with cloud-platform scope = full project access.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1: default SA with full cloud-platform scope</li><li>db-server-1: default SA with full cloud-platform scope</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create dedicated service accounts with minimal scopes.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 4.1</li><li>CIS GCP 4.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Cloud Storage">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">Publicly accessible storage buckets</span>
+        <span class="finding-id">STOR-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Buckets exposed to allUsers/allAuthenticatedUsers.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>public-assets: allUsers access</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove allUsers/allAuthenticatedUsers bindings. Use signed URLs for sharing.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 5.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Cloud SQL">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">Cloud SQL authorized networks include 0.0.0.0/0</span>
+        <span class="finding-id">DB-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Database accessible from any IP.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-db: authorized=0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove 0.0.0.0/0. Use specific CIDR ranges or private IP.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 6.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">GKE cluster &#x27;prod-cluster&#x27; uses basic authentication</span>
+        <span class="finding-id">GKE-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Basic auth (username/password) for API server.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Disable basic auth. Use IAM/OIDC.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.1.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Primitive (basic) roles in use (6)</span>
+        <span class="finding-id">IAM-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Primitive roles are overly broad. Use predefined/custom roles.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (6)</div>
+                  <ul class="affected-list"><li>user:admin@corp.com → Owner (roles/owner)</li><li>serviceAccount:ci-cd@proj.iam.gserviceaccount.com → Owner (roles/owner)</li><li>user:dev1@corp.com → Editor (roles/editor)</li><li>user:dev2@corp.com → Editor (roles/editor)</li><li>user:contractor@gmail.com → Editor (roles/editor)</li><li>user:auditor@corp.com → Viewer (roles/viewer)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Replace Owner/Editor/Viewer with least-privilege predefined roles.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Separation of duties violations (5)</span>
+        <span class="finding-id">IAM-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Users hold conflicting role combinations.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (5)</div>
+                  <ul class="affected-list"><li>user:admin@corp.com: roles/iam.serviceAccountAdmin + roles/iam.serviceAccountUser</li><li>user:admin@corp.com: roles/iam.serviceAccountAdmin + roles/iam.serviceAccountTokenCreator</li><li>user:dev1@corp.com: roles/iam.serviceAccountAdmin + roles/iam.serviceAccountUser</li><li>user:dev1@corp.com: roles/iam.serviceAccountAdmin + roles/iam.serviceAccountTokenCreator</li><li>user:dev2@corp.com: roles/iam.serviceAccountAdmin + roles/iam.serviceAccountTokenCreator</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Separate SA Admin from SA User/Token Creator roles.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.8</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">KMS admin and encrypter/decrypter role overlap</span>
+        <span class="finding-id">IAM-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Users with both KMS admin and crypto roles can self-approve.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>user:admin@corp.com</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Separate KMS admin from crypto operations roles.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.11</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Domain restricted sharing not enforced</span>
+        <span class="finding-id">IAM-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>IAM bindings can include external identities.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set iam.allowedPolicyMemberDomains org constraint.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Network &amp; VPC">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Default VPC network exists</span>
+        <span class="finding-id">NET-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Default network has permissive auto-created firewall rules.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>default</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Delete default VPC. Create custom VPCs with explicit rules.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 3.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Network &amp; VPC">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Subnets without VPC Flow Logs (2)</span>
+        <span class="finding-id">NET-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Flow logs provide network monitoring visibility.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>default-subnet</li><li>prod-subnet-2</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable VPC Flow Logs on all subnets.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 3.8</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Compute Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">VMs with public IP addresses (2)</span>
+        <span class="finding-id">COMP-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>VMs directly exposed to internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1: 35.1.2.3</li><li>db-server-1: 35.4.5.6</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove external IPs. Use Cloud NAT or IAP for access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 4.9</li><li>GCP — Private Access Best Practices</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Compute Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">OS Login not enabled project-wide</span>
+        <span class="finding-id">COMP-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>OS Login manages SSH keys centrally via IAM.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set project metadata: enable-oslogin=TRUE.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 4.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Cloud Storage">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Buckets without Uniform Bucket-Level Access (2)</span>
+        <span class="finding-id">STOR-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>ACLs and IAM both control access — inconsistent permissions.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>data-bucket</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Uniform Bucket-Level Access on all buckets.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 5.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Cloud SQL">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Cloud SQL instances with public IPs (1)</span>
+        <span class="finding-id">DB-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>SQL instances directly accessible from internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Use private IP only. Remove public IP. Connect via Cloud SQL Proxy.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 6.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Cloud SQL">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Cloud SQL without SSL enforcement (1)</span>
+        <span class="finding-id">DB-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Unencrypted database connections allowed.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set requireSsl=true on all SQL instances.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 6.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Cloud SQL">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Cloud SQL without automated backups (1)</span>
+        <span class="finding-id">DB-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No automated backups configured.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>dev-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable automated backups with point-in-time recovery.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 6.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Monitoring">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Insufficient audit logging coverage</span>
+        <span class="finding-id">LOG-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Data Access logs not enabled for all services.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable DATA_READ and DATA_WRITE audit logs.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 2.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Monitoring">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">No log sinks (exports) configured</span>
+        <span class="finding-id">LOG-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Logs not exported to external storage/SIEM.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create log sinks to BigQuery, Cloud Storage, or Pub/Sub.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 2.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Monitoring">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">No log-based metrics configured</span>
+        <span class="finding-id">LOG-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No metrics for critical security events.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create log metrics for IAM changes, firewall changes, etc.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 2.4-2.11</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Monitoring">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">No alerting policies configured</span>
+        <span class="finding-id">LOG-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No alerts for security events.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create alert policies on log-based metrics.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 2.4-2.11</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="BigQuery">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">BigQuery datasets with broad access</span>
+        <span class="finding-id">BQ-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Datasets accessible to allAuthenticatedUsers.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>analytics: allAuthenticatedUsers</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove allAuthenticatedUsers. Grant specific roles.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 7.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="CIEM Entitlements">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Gmail (external) accounts with IAM access (1)</span>
+        <span class="finding-id">CIEM-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Non-organizational (@gmail.com) identities have project access.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>user:contractor@gmail.com → roles/editor</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove external identities. Use organization domain accounts only.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Service Account Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Service account keys older than 90 days (2)</span>
+        <span class="finding-id">SA-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>SA keys should be rotated every 90 days.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>key1...: 631d old</li><li>key2...: 422d old</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Rotate or delete old SA keys. Use Workload Identity where possible.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Service Account Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Many users can impersonate service accounts (4)</span>
+        <span class="finding-id">SA-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>SA Token Creator enables impersonation of any SA.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (4)</div>
+                  <ul class="affected-list"><li>user:admin@corp.com</li><li>user:dev1@corp.com</li><li>user:dev2@corp.com</li><li>user:dev3@corp.com</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict Token Creator role. Use conditional bindings.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">GKE cluster &#x27;prod-cluster&#x27; has legacy ABAC enabled</span>
+        <span class="finding-id">GKE-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Legacy ABAC bypasses RBAC controls.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Disable legacy ABAC. Use RBAC only.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.8.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">GKE clusters without Network Policy (1)</span>
+        <span class="finding-id">GKE-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No pod-to-pod network segmentation.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Network Policy (Calico) on all clusters.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.6.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">GKE clusters with public nodes (1)</span>
+        <span class="finding-id">GKE-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Nodes have public IPs, exposed to internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Private Cluster (private nodes + private endpoint).</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.4.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">GKE clusters without Workload Identity (1)</span>
+        <span class="finding-id">GKE-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Pods may use node SA instead of per-pod identity.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Workload Identity for per-pod IAM binding.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.2.1</li><li>GCP — Workload Identity</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Serverless Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Cloud Functions publicly invocable</span>
+        <span class="finding-id">FN-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Functions callable by anyone on internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>process-data: allUsers invoker</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove allUsers. Require authentication for function invocation.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>GCP — Cloud Functions IAM</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Serverless Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Functions using default App Engine SA (1)</span>
+        <span class="finding-id">FN-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Default SA has Editor role on project.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>process-data</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create dedicated per-function service accounts with minimal roles.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>GCP — Cloud Functions Identity</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IaC Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Terraform state misconfigurations (1)</span>
+        <span class="finding-id">IAC-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Terraform state contains risky configurations.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>[Network] Firewall rule allows all IPs — found 1 occurrence(s)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Review and remediate Terraform configs. Run `terraform plan` to validate.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP — IaC Best Practices</li><li>Terraform — GCP Security</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="KMS &amp; Encryption">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">KMS keys without rotation period (1)</span>
+        <span class="finding-id">KMS-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Keys not automatically rotated.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>key2</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set rotation period ≤365 days on all KMS keys.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.10</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Excessive SA Admin users (4)</span>
+        <span class="finding-id">IAM-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Many users can create/manage service accounts.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (4)</div>
+                  <ul class="affected-list"><li>user:admin@corp.com</li><li>user:dev1@corp.com</li><li>user:dev2@corp.com</li><li>user:ops1@corp.com</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Limit SA Admin role.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Admin roles without IAM conditions</span>
+        <span class="finding-id">IAM-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Admin bindings lack time/resource conditions.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (4)</div>
+                  <ul class="affected-list"><li>roles/iam.serviceAccountAdmin</li><li>roles/cloudkms.admin</li><li>roles/storage.admin</li><li>roles/compute.admin</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Add IAM conditions (time-bound, resource-scoped).</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>GCP — IAM Conditions Best Practices</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Network &amp; VPC">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Subnets without Private Google Access (2)</span>
+        <span class="finding-id">NET-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>VMs must use public IPs to reach Google APIs.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>default-subnet</li><li>prod-subnet-2</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Private Google Access on all subnets.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 3.9</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Compute Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Serial port access enabled on VMs</span>
+        <span class="finding-id">COMP-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Serial port can be used for interactive access.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>web-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Disable serial port: metadata serial-port-enable=false.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 4.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Compute Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">VMs without Shielded VM features (2)</span>
+        <span class="finding-id">COMP-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Shielded VM provides boot integrity and vTPM.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>db-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Shielded VM (vTPM + Integrity Monitoring).</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 4.8</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Compute Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Disks without CMEK encryption (2)</span>
+        <span class="finding-id">COMP-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Disks use Google-managed keys instead of CMEK.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-disk</li><li>db-disk</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Encrypt disks with Customer-Managed Encryption Keys (CMEK).</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 4.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Cloud Storage">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Buckets without access logging (2)</span>
+        <span class="finding-id">STOR-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Bucket access not being logged.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>data-bucket</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable access logging: gsutil logging set on gs://bucket.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 5.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Cloud Storage">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Buckets without CMEK encryption (2)</span>
+        <span class="finding-id">STOR-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Buckets use Google-managed keys.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>data-bucket</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set default CMEK encryption on buckets.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 5.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Cloud SQL">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Cloud SQL security flags not set (3)</span>
+        <span class="finding-id">DB-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Database security flags missing.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>prod-db: log_checkpoints not on</li><li>prod-db: log_connections not on</li><li>dev-db: local_infile not disabled</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set recommended database flags per CIS benchmark.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 6.1-6.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="BigQuery">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">BigQuery datasets without CMEK (1)</span>
+        <span class="finding-id">BQ-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Datasets use Google-managed encryption.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>analytics</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set CMEK on BigQuery datasets.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 7.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Service Account Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">User-managed SA keys exist (2)</span>
+        <span class="finding-id">SA-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>User-managed keys are high risk — prefer Workload Identity.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>Key: rviceAccounts/ci-cd@/keys/key1</li><li>Key: serviceAccounts/app@/keys/key2</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Migrate to Workload Identity Federation. Delete user-managed keys.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.4</li><li>GCP — Workload Identity</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">GKE clusters without Shielded GKE Nodes (1)</span>
+        <span class="finding-id">GKE-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Nodes lack integrity verification.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Shielded GKE Nodes.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.5.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Binary Authorization not enabled (2)</span>
+        <span class="finding-id">GKE-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Unsigned/unverified container images can be deployed.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>prod-cluster</li><li>dev-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Binary Authorization for image signing verification.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.9.1</li><li>GCP — Binary Authorization</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="GKE Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">GKE node pools without auto-upgrade (1)</span>
+        <span class="finding-id">GKE-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Nodes may run outdated/vulnerable versions.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-cluster/default-pool</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable node auto-upgrade.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GKE 5.5.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Serverless Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Functions with ALLOW_ALL ingress (1)</span>
+        <span class="finding-id">FN-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Functions accept traffic from any source.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>process-data</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set ingress to ALLOW_INTERNAL_ONLY or ALLOW_INTERNAL_AND_GCLB.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>GCP — Cloud Functions Networking</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Container Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Container Analysis API not enabled</span>
+        <span class="finding-id">CONT-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No automated vulnerability scanning for container images.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Container Analysis and Container Scanning APIs.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>GCP — Container Analysis</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="IAM &amp; Org Policy">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">Essential Contacts not configured</span>
+        <span class="finding-id">IAM-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No notification contacts for security alerts.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure Essential Contacts for Security notifications.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP 1.16</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Cloud Storage">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">Buckets without retention policies</span>
+        <span class="finding-id">STOR-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No data retention/lifecycle policies.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>logs-bucket</li><li>data-bucket</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set retention policies for compliance.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>GCP — Bucket Lifecycle</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Service Account Security">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">Disabled service accounts still exist (1)</span>
+        <span class="finding-id">SA-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Disabled SAs should be cleaned up.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>old-service@proj.iam.gserviceaccount.com</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Delete disabled service accounts.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>GCP — SA Lifecycle</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="CIS Benchmark">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">CIS GCP Foundation Benchmark v2.0 assessment complete</span>
+        <span class="finding-id">CIS-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Checks mapped to CIS GCP Foundation Benchmark sections 1-7.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Review individual findings for CIS section references.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS GCP Foundation Benchmark v2.0</li></ul>
+                </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Google Cloud Platform Security Scanner &middot; Generated 2026-03-08T06:01:54 &middot;
+    For authorized security assessments only
+  </div>
+</div>
+
+<script>
+// Toggle finding details
+document.querySelectorAll('.finding-header').forEach(el => {
+  el.addEventListener('click', () => {
+    el.parentElement.classList.toggle('open');
+  });
+});
+
+// Severity filter
+function filterFindings(sev) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.finding-card').forEach(card => {
+    if (sev === 'ALL' || card.dataset.severity === sev) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Expand all for print
+window.addEventListener('beforeprint', () => {
+  document.querySelectorAll('.finding-card').forEach(c => c.classList.add('open'));
+});
+</script>
+</body>
+</html>

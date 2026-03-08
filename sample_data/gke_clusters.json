@@ -1,0 +1,65 @@
+{
+  "clusters": [
+    {
+      "name": "prod-cluster",
+      "legacyAbac": {
+        "enabled": true
+      },
+      "networkPolicy": {
+        "enabled": false
+      },
+      "privateClusterConfig": {
+        "enablePrivateNodes": false
+      },
+      "workloadIdentityConfig": {},
+      "shieldedNodes": {
+        "enabled": false
+      },
+      "binaryAuthorization": {
+        "enabled": false
+      },
+      "masterAuth": {
+        "username": "admin",
+        "password": "secret"
+      },
+      "nodePools": [
+        {
+          "name": "default-pool",
+          "management": {
+            "autoUpgrade": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "dev-cluster",
+      "legacyAbac": {
+        "enabled": false
+      },
+      "networkPolicy": {
+        "enabled": true
+      },
+      "privateClusterConfig": {
+        "enablePrivateNodes": true
+      },
+      "workloadIdentityConfig": {
+        "workloadPool": "proj.svc.id.goog"
+      },
+      "shieldedNodes": {
+        "enabled": true
+      },
+      "binaryAuthorization": {
+        "enabled": false
+      },
+      "masterAuth": {},
+      "nodePools": [
+        {
+          "name": "dev-pool",
+          "management": {
+            "autoUpgrade": true
+          }
+        }
+      ]
+    }
+  ]
+}

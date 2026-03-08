@@ -1,0 +1,19 @@
+{
+  "keys": [
+    {
+      "name": "projects/proj/serviceAccounts/ci-cd@/keys/key1",
+      "keyType": "USER_MANAGED",
+      "validAfterTime": "2024-06-15T00:00:00Z"
+    },
+    {
+      "name": "projects/proj/serviceAccounts/app@/keys/key2",
+      "keyType": "USER_MANAGED",
+      "validAfterTime": "2025-01-10T00:00:00Z"
+    },
+    {
+      "name": "projects/proj/serviceAccounts/ci-cd@/keys/key3",
+      "keyType": "SYSTEM_MANAGED",
+      "validAfterTime": "2026-03-01T00:00:00Z"
+    }
+  ]
+}

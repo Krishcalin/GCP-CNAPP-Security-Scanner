@@ -1,0 +1,13 @@
+{
+  "cryptoKeys": [
+    {
+      "name": "projects/proj/locations/us/keyRings/kr/cryptoKeys/key1",
+      "rotationPeriod": "7776000s",
+      "iamBindings": []
+    },
+    {
+      "name": "projects/proj/locations/us/keyRings/kr/cryptoKeys/key2",
+      "iamBindings": []
+    }
+  ]
+}

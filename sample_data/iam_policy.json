@@ -1,0 +1,78 @@
+{
+  "bindings": [
+    {
+      "role": "roles/owner",
+      "members": [
+        "user:admin@corp.com",
+        "serviceAccount:ci-cd@proj.iam.gserviceaccount.com"
+      ]
+    },
+    {
+      "role": "roles/editor",
+      "members": [
+        "user:dev1@corp.com",
+        "user:dev2@corp.com",
+        "user:contractor@gmail.com"
+      ]
+    },
+    {
+      "role": "roles/viewer",
+      "members": [
+        "user:auditor@corp.com"
+      ]
+    },
+    {
+      "role": "roles/iam.serviceAccountAdmin",
+      "members": [
+        "user:admin@corp.com",
+        "user:dev1@corp.com",
+        "user:dev2@corp.com",
+        "user:ops1@corp.com"
+      ]
+    },
+    {
+      "role": "roles/iam.serviceAccountUser",
+      "members": [
+        "user:admin@corp.com",
+        "user:dev1@corp.com"
+      ]
+    },
+    {
+      "role": "roles/iam.serviceAccountTokenCreator",
+      "members": [
+        "user:admin@corp.com",
+        "user:dev1@corp.com",
+        "user:dev2@corp.com",
+        "user:dev3@corp.com"
+      ]
+    },
+    {
+      "role": "roles/cloudkms.admin",
+      "members": [
+        "user:admin@corp.com",
+        "user:kms-admin@corp.com"
+      ]
+    },
+    {
+      "role": "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+      "members": [
+        "user:admin@corp.com",
+        "serviceAccount:app@proj.iam.gserviceaccount.com"
+      ]
+    },
+    {
+      "role": "roles/storage.admin",
+      "members": [
+        "user:admin@corp.com"
+      ]
+    },
+    {
+      "role": "roles/compute.admin",
+      "members": [
+        "user:admin@corp.com",
+        "user:dev1@corp.com"
+      ],
+      "condition": null
+    }
+  ]
+}

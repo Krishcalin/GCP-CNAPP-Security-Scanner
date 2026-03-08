@@ -1,0 +1,12 @@
+{
+  "auditConfigs": [
+    {
+      "service": "allServices",
+      "auditLogConfigs": [
+        {
+          "logType": "ADMIN_READ"
+        }
+      ]
+    }
+  ]
+}

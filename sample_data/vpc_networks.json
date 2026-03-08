@@ -1,0 +1,19 @@
+{
+  "networks": [
+    {
+      "name": "default",
+      "autoCreateSubnetworks": true,
+      "subnetworks": [
+        "default-subnet"
+      ]
+    },
+    {
+      "name": "prod-vpc",
+      "autoCreateSubnetworks": false,
+      "subnetworks": [
+        "prod-subnet-1",
+        "prod-subnet-2"
+      ]
+    }
+  ]
+}

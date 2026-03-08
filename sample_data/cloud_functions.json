@@ -1,0 +1,23 @@
+{
+  "functions": [
+    {
+      "name": "process-data",
+      "ingressSettings": "ALLOW_ALL",
+      "serviceAccountEmail": "proj@appspot.gserviceaccount.com",
+      "iamBindings": [
+        {
+          "role": "roles/cloudfunctions.invoker",
+          "members": [
+            "allUsers"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "internal-api",
+      "ingressSettings": "ALLOW_INTERNAL_ONLY",
+      "serviceAccountEmail": "api-fn@proj.iam.gserviceaccount.com",
+      "iamBindings": []
+    }
+  ]
+}

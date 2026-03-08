@@ -1,0 +1,53 @@
+{
+  "instances": [
+    {
+      "name": "prod-db",
+      "databaseVersion": "POSTGRES_14",
+      "ipAddresses": [
+        {
+          "type": "PRIMARY",
+          "ipAddress": "35.10.20.30"
+        }
+      ],
+      "settings": {
+        "ipConfiguration": {
+          "requireSsl": false,
+          "authorizedNetworks": [
+            {
+              "value": "0.0.0.0/0"
+            }
+          ]
+        },
+        "backupConfiguration": {
+          "enabled": true
+        },
+        "databaseFlags": []
+      }
+    },
+    {
+      "name": "dev-db",
+      "databaseVersion": "MYSQL_8_0",
+      "ipAddresses": [
+        {
+          "type": "PRIVATE",
+          "ipAddress": "10.0.1.5"
+        }
+      ],
+      "settings": {
+        "ipConfiguration": {
+          "requireSsl": true,
+          "authorizedNetworks": []
+        },
+        "backupConfiguration": {
+          "enabled": false
+        },
+        "databaseFlags": [
+          {
+            "name": "local_infile",
+            "value": "on"
+          }
+        ]
+      }
+    }
+  ]
+}

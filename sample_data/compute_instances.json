@@ -1,0 +1,88 @@
+{
+  "instances": [
+    {
+      "name": "web-server-1",
+      "serviceAccounts": [
+        {
+          "email": "123-compute@developer.gserviceaccount.com",
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ]
+        }
+      ],
+      "networkInterfaces": [
+        {
+          "accessConfigs": [
+            {
+              "type": "ONE_TO_ONE_NAT",
+              "natIP": "35.1.2.3"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "items": [
+          {
+            "key": "serial-port-enable",
+            "value": "true"
+          }
+        ]
+      },
+      "shieldedInstanceConfig": {
+        "enableVtpm": false,
+        "enableIntegrityMonitoring": false
+      }
+    },
+    {
+      "name": "app-server-1",
+      "serviceAccounts": [
+        {
+          "email": "app@proj.iam.gserviceaccount.com",
+          "scopes": [
+            "https://www.googleapis.com/auth/compute.readonly"
+          ]
+        }
+      ],
+      "networkInterfaces": [
+        {
+          "accessConfigs": []
+        }
+      ],
+      "metadata": {
+        "items": []
+      },
+      "shieldedInstanceConfig": {
+        "enableVtpm": true,
+        "enableIntegrityMonitoring": true
+      }
+    },
+    {
+      "name": "db-server-1",
+      "serviceAccounts": [
+        {
+          "email": "123-compute@developer.gserviceaccount.com",
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ]
+        }
+      ],
+      "networkInterfaces": [
+        {
+          "accessConfigs": [
+            {
+              "type": "ONE_TO_ONE_NAT",
+              "natIP": "35.4.5.6"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "items": []
+      },
+      "shieldedInstanceConfig": {
+        "enableVtpm": false,
+        "enableIntegrityMonitoring": false
+      }
+    }
+  ]
+}
