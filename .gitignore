@@ -1,6 +1,6 @@
 __pycache__/
 *.py[cod]
 venv/
-*.json
-!sample_data/*.json
+*.html
+!sample_data/sample_report.html
 exports/
