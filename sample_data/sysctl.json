@@ -1,5 +1,0 @@
-{
-  "kernel.sysrq": "1",
-  "kernel.randomize_va_space": "0",
-  "vm.drop_caches": "3"
-}
